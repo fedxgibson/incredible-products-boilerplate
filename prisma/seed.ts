@@ -8,6 +8,7 @@ async function main() {
     data: {
       email: 'test@example.com',
       name: 'Test User',
+      password: 'Test12345!'
     },
   })
 

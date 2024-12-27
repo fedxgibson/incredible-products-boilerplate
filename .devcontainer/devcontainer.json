@@ -5,6 +5,7 @@
     "cpus": 4
   },
   "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "portsAttributes": {
@@ -24,6 +25,7 @@
     },
     "vscode": {
       "extensions": [
+        "hashicorp.terraform",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "prisma.prisma",

@@ -89,7 +89,7 @@ resource "digitalocean_app" "nextjs" {
         deploy_on_push = true
       }
 
-      build_command = "ls -la && cat tsconfig.json && npm install && npm run build && npm run db:migrate"
+      build_command = "npm install && npm run build && npm run db:migrate"
       run_command   = "npm start"
 
       # Database connection environment variable

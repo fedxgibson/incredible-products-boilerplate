@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next",
-    "build": "next build && cp -r .next/static .next/standalone/.next/",
+    "build": "next build",
     "lint": "next lint",
     "start": "node .next/standalone/server.js",
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",

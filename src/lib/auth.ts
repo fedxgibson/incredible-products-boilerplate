@@ -5,6 +5,7 @@ import { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const authConfig: AuthOptions = {
+  secret: process.env.JWT_SECRET,
   providers: [
     Credentials({
       credentials: {

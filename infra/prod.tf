@@ -89,8 +89,8 @@ resource "digitalocean_app" "nextjs" {
         deploy_on_push = true
       }
 
-      build_command = "npm install && npm run build && npm run db:migrate"
-      run_command   = "npm start"
+      build_command = "make build && make db-migrate"
+      run_command   = "make prod-up"
 
       # Database connection environment variable
       env {

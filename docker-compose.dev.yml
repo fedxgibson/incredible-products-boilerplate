@@ -1,0 +1,22 @@
+services:
+  db:
+    extends:
+      file: docker-compose.base.yml
+      service: db
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/myapp
+      - NODE_ENV=development
+    depends_on:
+      - db
+    command: npm run dev
+    volumes:
+      - .:/app
+    restart: always

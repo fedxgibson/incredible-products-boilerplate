@@ -22,6 +22,12 @@ variable "do_token" {
   sensitive   = true
 }
 
+variable "repository_name" {
+  description = "Name of repository"
+  type        = string
+  default     = ""
+}
+
 variable "app_name" {
   description = "Name of your Next.js application"
   type        = string
@@ -84,13 +90,12 @@ resource "digitalocean_app" "nextjs" {
       instance_count     = 1
 
       github {
-        repo           = "fedxgibson/boilerplate-nextjs"
+        repo           = var.repository_name
         branch         = "main"
         deploy_on_push = true
       }
 
-      build_command = "make build && make db-migrate"
-      run_command   = "make prod-up"
+      dockerfile_path = "Dockerfile"
 
       # Database connection environment variable
       env {

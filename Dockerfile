@@ -17,8 +17,18 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+
+# Copy Prisma files and necessary node modules for migrations
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package*.json ./
+RUN npm install --production=false prisma
+
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+
+COPY start.sh .
+
+RUN chmod +x start.sh
+CMD ["./start.sh"]

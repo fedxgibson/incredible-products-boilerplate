@@ -17,7 +17,7 @@ export default function LandingPage() {
             href="/auth/login"
             className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
           >
-            Get Started
+            Get Started Now!
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
           <Link

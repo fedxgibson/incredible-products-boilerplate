@@ -1,71 +1,56 @@
 # Variables
-COMPOSE = docker compose
-COMPOSE_DEV = docker compose -f docker-compose.yml -f docker-compose.dev.yml
-APP_SERVICE = app
+ENV ?= development
+COMPOSE = docker compose$(if $(filter production,$(ENV)), -f docker-compose.yml)
 
-# Development commands
-.PHONY: dev-up
-dev-up:
-	$(COMPOSE_DEV) up --build -d
+SERVICE ?= app  # Default service
+ENV ?= development  # Default environment
+CMD ?= # Optional command to run
 
-.PHONY: dev-down
-dev-down:
-	$(COMPOSE_DEV) down
+.PHONY: build up down logs shell exec
 
-.PHONY: dev-logs
-dev-logs:
-	$(COMPOSE_DEV) logs -f
+build:
+	$(COMPOSE) build
 
-.PHONY: dev-shell
-dev-shell:
-	$(COMPOSE_DEV) exec $(APP_SERVICE) sh
+up:
+	$(COMPOSE) up -d
 
-# Production commands
-.PHONY: prod-up
-prod-up:
-	$(COMPOSE) up --build -d
-
-.PHONY: prod-down
-prod-down:
+down:
 	$(COMPOSE) down
 
-.PHONY: prod-logs
-prod-logs:
-	$(COMPOSE) logs -f
+logs:
+	$(COMPOSE) logs -f $(SERVICE)
 
-.PHONY: prod-shell
-prod-shell:
-	$(COMPOSE) exec $(APP_SERVICE) sh
+shell:
+	$(COMPOSE) exec $(SERVICE) sh
 
 # Application commands
 .PHONY: lint
-lint:
-	$(COMPOSE_DEV) exec $(APP_SERVICE) npm run lint
 
-.PHONY: start
-start:
-	$(COMPOSE) exec $(APP_SERVICE) npm run start
+lint:
+	$(COMPOSE) exec app npm run lint
+	$(COMPOSE) exec server npm run lint
+	$(COMPOSE) exec qa npm run lint
+
+run-qa-tests:
+	$(COMPOSE) exec qa npm run tests
+
+run-unit-tests:
+	$(COMPOSE) exec server npm run tests
+	$(COMPOSE) exec app npm run tests
 
 # Database commands
 .PHONY: db-shell
-db-shell:
-	$(COMPOSE_DEV) exec db psql -U ${POSTGRES_USER:-postgres} -d ${DB_NAME:-myapp}
 
-.PHONY: db-shell-prod
-db-shell-prod:
-	$(COMPOSE) exec db psql -U ${POSTGRES_USER:-postgres} -d ${DB_NAME:-myapp}
+db-shell:
+	$(COMPOSE) exec db mongosh
 
 .PHONY: seed
 seed:
-	$(COMPOSE_DEV) exec $(APP_SERVICE) npm run seed
+	$(COMPOSE) exec server npm run seed
 
 .PHONY: db-migrate
 db-migrate:
-	$(COMPOSE_DEV) exec $(APP_SERVICE) npm run db:migrate
-
-.PHONY: db-migrate-prod
-db-migrate-prod:
-	$(COMPOSE) exec $(APP_SERVICE) npm run db:migrate
+	$(COMPOSE) exec server npm run db:migrate
 
 # Terraform commands
 .PHONY: tf-init
@@ -101,41 +86,37 @@ ps:
 # Help
 .PHONY: help
 help:
-	@echo "Available commands:"
+	@echo "Usage: make [target] [ENV=development|production] [SERVICE=service_name] [CMD=command]"
 	@echo ""
-	@echo "Development Environment:"
-	@echo "  dev-up        : Start development environment"
-	@echo "  dev-down      : Stop development environment"
-	@echo "  dev-logs      : Show development logs"
-	@echo "  dev-shell     : Access development shell"
-	@echo ""
-	@echo "Production Environment:"
-	@echo "  prod-up       : Start production environment"
-	@echo "  prod-down     : Stop production environment"
-	@echo "  prod-logs     : Show production logs"
-	@echo "  prod-shell    : Access production shell"
+	@echo "Docker Compose Commands:"
+	@echo "  up              : Start containers (default: development)"
+	@echo "  down            : Stop containers"
+	@echo "  logs            : View logs (optional: SERVICE=service_name)"
+	@echo "  shell           : Open shell in container (optional: SERVICE=service_name)"
 	@echo ""
 	@echo "Application Commands:"
-	@echo "  lint          : Run linter"
-	@echo "  start         : Start production server"
+	@echo "  lint            : Run linter for app, server, and qa services"
 	@echo ""
 	@echo "Database Commands:"
-	@echo "  db-shell      : Access development database shell"
-	@echo "  db-shell-prod : Access production database shell"
-	@echo "  seed          : Run database seed (development)"
-	@echo "  db-migrate    : Run database migrations (development)"
-	@echo "  db-migrate-prod: Run database migrations (production)"
+	@echo "  db-shell        : Access MongoDB shell"
+	@echo "  seed            : Run database seed"
+	@echo "  db-migrate      : Run database migrations"
 	@echo ""
 	@echo "Terraform Commands:"
-	@echo "  tf-init       : Initialize Terraform"
-	@echo "  tf-plan       : Plan Terraform changes"
-	@echo "  tf-apply      : Apply Terraform changes"
-	@echo "  tf-destroy    : Destroy Terraform resources"
+	@echo "  tf-init         : Initialize Terraform"
+	@echo "  tf-plan         : Plan Terraform changes"
+	@echo "  tf-apply        : Apply Terraform changes"
+	@echo "  tf-destroy      : Destroy Terraform resources"
 	@echo ""
 	@echo "Utility Commands:"
-	@echo "  ps            : List running containers"
-	@echo "  prune         : Clean project: stopped containers, images, network, cache, etc"
-	@echo "  restart   		 : Restart all services (development)"
+	@echo "  ps              : List running containers"
+	@echo "  prune           : Remove all unused containers, networks, images"
+	@echo "  restart         : Restart all running containers"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make up                     # Start development environment"
+	@echo "  make up ENV=production      # Start production environment"
+	@echo "  make logs SERVICE=app       # View app service logs"
+	@echo "  make shell SERVICE=server   # Open shell in server container"
 
-# Default target
 .DEFAULT_GOAL := help

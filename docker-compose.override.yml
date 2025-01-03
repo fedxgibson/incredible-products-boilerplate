@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: ./app
+      target: deps
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+    volumes:
+      - ./app:/app:rw
+      - app_node_modules:/app/node_modules:rw
+  
+  server:
+    build:
+      context: ./server
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+    volumes:
+      - ./server:/app:rw
+      - server_node_modules:/app/node_modules:rw
+
+  qa:
+    build:
+      context: ./qa
+    privileged: true 
+    volumes:
+      - ./qa:/app:rw
+      - qa_node_modules:/app/node_modules:rw
+      - /var/run/dbus:/var/run/dbus
+    depends_on:
+      - app
+    environment:
+      - BASE_URL=http://app:3000
+      - NODE_ENV=test
+      - JEST_PUPPETEER_CONFIG=puppeteer.config.js
+    tmpfs:
+    - /tmp
+    
+volumes:
+  qa_node_modules:
+  app_node_modules:
+  server_node_modules:

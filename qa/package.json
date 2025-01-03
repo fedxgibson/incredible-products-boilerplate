@@ -1,0 +1,23 @@
+{
+  "name": "qa-testing",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "jest -c jest.config.js",
+    "test:e2e:watch": "jest -c jest.config.js --watch",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
+  },
+  "dependencies": {
+    "puppeteer": "^21.5.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-puppeteer": "^9.0.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.20",
+    "babel-jest": "^29.7.0",
+    "expect-puppeteer": "^9.0.0",
+    "faker": "^5.5.3"
+  }
+}

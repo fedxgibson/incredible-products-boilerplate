@@ -1,3 +1,13 @@
 .git
-.next
+.gitignore
 node_modules
+dist
+.env
+.env.*
+*.log
+.DS_Store
+.idea
+.vscode
+README.md
+Dockerfile
+.dockerignore

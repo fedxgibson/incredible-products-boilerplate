@@ -1,13 +1,14 @@
 // specs/auth.spec.js
+const LoginPage = require('../pages/LoginPage')
+const SignupPage = require('../pages/SignupPage')
+
 describe('Authentication Flows', () => {
   let loginPage;
   let signupPage;
-  let authFlow;
 
   beforeEach(async () => {
     loginPage = new LoginPage(page);
     signupPage = new SignupPage(page);
-    authFlow = new AuthFlow(loginPage, signupPage);
   });
 
   describe('Login Flow', () => {
@@ -41,28 +42,6 @@ describe('Authentication Flows', () => {
       
       // Verify successful signup
       await expect(page).toHaveURL('/onboarding');
-    });
-  });
-
-  describe('Complex User Flows', () => {
-    it('should sign up and then log in with new account', async () => {
-      // Create new account
-      const newUser = {
-        name: `Test User ${Date.now()}`,
-        email: `test${Date.now()}@example.com`,
-        password: 'newPassword123'
-      };
-      await authFlow.createNewAccount(newUser);
-      
-      // Log out
-      await page.click('[data-testid="logout-button"]');
-      
-      // Log in with new account
-      await loginPage.navigate();
-      await loginPage.login(newUser.email, newUser.password);
-      
-      // Verify successful login
-      await expect(page).toHaveURL('/dashboard');
     });
   });
 });

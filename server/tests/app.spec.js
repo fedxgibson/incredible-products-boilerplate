@@ -1,164 +1,264 @@
-const App = require('../src/app');
-const MongoDBConnection = require('../src/frameworks/mongodb/connection');
 const express = require('express');
+const bodyParser = require('body-parser');
+const MongoDBConnection = require('../src/mongodb/connection');
+const UserRepository = require('../src/repositories/user-repository');
+const CreateUserUseCase = require('../src/use-cases/user/create-user');
+const LoginUserUseCase = require('../src/use-cases/auth/login-user');
+const setupRoutes = require('../src/http/routes');
+const App = require('../src/app');
 
-// Mock process.exit
-jest.spyOn(process, 'exit').mockImplementation(() => {});
-
-// Mock express before any imports
+// Mocks
 jest.mock('express', () => {
-  const mockRouter = {
-    post: jest.fn(),
-    get: jest.fn(),
-    use: jest.fn()
-  };
-
-  const mockApp = {
-    listen: jest.fn((port, host, callback) => {
-      callback?.();
-      return { close: jest.fn() };
-    }),
+  const mockExpress = jest.fn(() => ({
     use: jest.fn(),
-    get: jest.fn()
-  };
-  
-  const mockExpress = jest.fn(() => mockApp);
-  mockExpress.Router = jest.fn(() => mockRouter);
-  
+    get: jest.fn(),
+    listen: jest.fn()
+  }));
+  mockExpress.json = jest.fn();
   return mockExpress;
 });
 
+jest.mock('body-parser', () => ({
+  json: jest.fn()
+}));
+
+jest.mock('../src/mongodb/connection');
+jest.mock('../src/repositories/user-repository');
+jest.mock('../src/use-cases/user/create-user');
+jest.mock('../src/use-cases/auth/login-user');
+jest.mock('../src/http/routes', () => {
+  return jest.fn()
+});
+
 describe('App', () => {
-  let mockDatabase;
-  let expressApp;
-  const mockOpts = {
-    PORT: 3002,
-    HOST: 'localhost',
-    MONGO_URI: 'mongodb://localhost:27017',
-    MONGO_DB: 'testdb',
+  let app;
+  let mockExpressInstance;
+  let mockMongoConnection;
+
+  const defaultConfig = {
+    port: 3000,
+    host: 'localhost',
+    mongoUri: 'mongodb://localhost:27017',
+    mongoDb: 'testdb',
+    jwtSecret: 'random',
+    jwtExpiresIn: '1h'
   };
 
   beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
     
-    // Get fresh express app instance
-    expressApp = express();
-
-    // Mock MongoDB connection
-    mockDatabase = {
-      connect: jest.fn().mockResolvedValue({}),
-      disconnect: jest.fn().mockResolvedValue({}),
+    // Setup Express mock
+    mockExpressInstance = {
+      use: jest.fn(),
+      get: jest.fn(),
+      listen: jest.fn((port, host, cb) => cb())
     };
-
-    jest.spyOn(MongoDBConnection.prototype, 'connect')
-      .mockImplementation(() => mockDatabase.connect());
-
-    // Mock console methods
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    express.mockReturnValue(mockExpressInstance);
+    
+    // Setup MongoDB connection mock
+    mockMongoConnection = {
+      connect: jest.fn().mockResolvedValue({ db: 'mockDb' })
+    };
+    MongoDBConnection.mockImplementation(() => mockMongoConnection);
+    
+    app = new App(defaultConfig);
   });
 
   describe('constructor', () => {
-    it('should initialize with provided options', () => {
-      const app = new App(mockOpts);
+    it('should initialize with provided configuration', () => {
+      expect(app.port).toBe(defaultConfig.port);
+      expect(app.host).toBe(defaultConfig.host);
+      expect(app.mongoUri).toBe(defaultConfig.mongoUri);
+      expect(app.mongoDb).toBe(defaultConfig.mongoDb);
+      expect(app.jwtExpiresIn).toBe(defaultConfig.jwtExpiresIn);
+      expect(app.jwtSecret).toBe(defaultConfig.jwtSecret);
+      expect(app.mongoDb).toBe(defaultConfig.mongoDb);
+      expect(MongoDBConnection).toHaveBeenCalledWith(
+        defaultConfig.mongoUri,
+        defaultConfig.mongoDb
+      );
+    });
 
-      expect(app.port).toBe(mockOpts.PORT);
-      expect(app.host).toBe(mockOpts.HOST);
-      expect(app.mongoUri).toBe(mockOpts.MONGO_URI);
-      expect(app.mongoDb).toBe(mockOpts.MONGO_DB);
+    it('should create express instance', () => {
+      expect(express).toHaveBeenCalled();
+      expect(app.express).toBeDefined();
     });
   });
 
-  describe('setup', () => {
-    it('should setup the application successfully', async () => {
-      const app = new App(mockOpts);
-      app.express = expressApp;
-      
-      const result = await app.setup();
-
-      expect(result).toBe(true);
-      expect(mockDatabase.connect).toHaveBeenCalled();
+  describe('setupMiddleware', () => {
+    beforeEach(() => {
+      app.setupMiddleware();
     });
 
-    it('should return false when setup fails', async () => {
-      const error = new Error('Setup failed');
-      mockDatabase.connect.mockRejectedValue(error);
-
-      const app = new App(mockOpts);
-      app.express = expressApp;
-      
-      const result = await app.setup();
-
-      expect(result).toBe(false);
-      expect(console.error).toHaveBeenCalledWith('Failed to setup application:', error);
+    it('should setup body-parser middleware', () => {
+      expect(bodyParser.json).toHaveBeenCalled();
+      expect(mockExpressInstance.use).toHaveBeenCalled();
     });
-  });
 
-  describe('initialize', () => {
-    it('should initialize the application when setup is successful', async () => {
-      const app = new App(mockOpts);
-      app.express = expressApp;
-      
-      await app.initialize();
-
-      expect(mockDatabase.connect).toHaveBeenCalled();
-      expect(expressApp.listen).toHaveBeenCalledWith(
-        mockOpts.PORT,
-        mockOpts.HOST,
+    it('should setup health check endpoint', () => {
+      expect(mockExpressInstance.get).toHaveBeenCalledWith(
+        '/health',
         expect.any(Function)
       );
     });
 
-    it('should exit process when setup fails', async () => {
-      const error = new Error('Database connection failed');
-      mockDatabase.connect.mockRejectedValue(error);
+    it('should return correct health check response', () => {
+      const mockReq = {};
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn()
+      };
 
-      const app = new App(mockOpts);
-      await app.initialize();
+      // Get the health check handler and execute it
+      const healthCheckHandler = mockExpressInstance.get.mock.calls.find(
+        call => call[0] === '/health'
+      )[1];
+      healthCheckHandler(mockReq, mockRes);
 
-      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith({ status: 'ok' });
     });
   });
 
   describe('setupDatabase', () => {
-    it('should establish database connection', async () => {
-      const app = new App(mockOpts);
+    it('should connect to database successfully', async () => {
+      const mockDb = { collection: jest.fn() };
+      mockMongoConnection.connect.mockResolvedValue(mockDb);
+
       await app.setupDatabase();
 
-      expect(mockDatabase.connect).toHaveBeenCalled();
+      expect(mockMongoConnection.connect).toHaveBeenCalled();
+      expect(app.db).toBe(mockDb);
     });
 
     it('should throw error when database connection fails', async () => {
-      const error = new Error('Database connection failed');
-      mockDatabase.connect.mockRejectedValue(error);
+      const errorMessage = 'Connection failed';
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      mockMongoConnection.connect.mockRejectedValue(new Error(errorMessage));
+      await expect(app.setupDatabase()).rejects.toThrow(errorMessage);
+      expect(consoleSpy).toHaveBeenCalled();
+    
+      consoleSpy.mockRestore();
+    });
+  });
 
-      const app = new App(mockOpts);
+  describe('setupUseCases', () => {
+    beforeEach(async () => {
+      app.db = { collection: jest.fn() };
+    });
 
-      await expect(app.setupDatabase()).rejects.toThrow('Database connection failed');
-      expect(console.error).toHaveBeenCalledWith('Database connection failed:', error);
+    it('should initialize user repository and use cases', () => {
+      app.setupUseCases();
+
+      expect(UserRepository).toHaveBeenCalledWith(app.db);
+      expect(CreateUserUseCase).toHaveBeenCalled();
+      expect(LoginUserUseCase).toHaveBeenCalled();
+      expect(app.useCases).toBeDefined();
+      expect(app.useCases.createUserUseCase).toBeDefined();
+      expect(app.useCases.loginUserUseCase).toBeDefined();
     });
   });
 
   describe('setupRoutes', () => {
-    it('should throw error when database is not connected', () => {
-      const app = new App(mockOpts);
-
-      expect(() => app.setupRoutes()).toThrow('Database connection not established');
+    beforeEach(() => {
+      app.db = { collection: jest.fn() };
+      app.setupUseCases(); // Setup use cases before testing routes
     });
 
-    it('should setup routes when database is connected', async () => {
-      const app = new App(mockOpts);
-      app.db = {}; // Mock database connection
-      app.express = expressApp;
-    
+    it('should setup routes with correct dependencies', () => {
       app.setupRoutes();
-    
-      expect(expressApp.use).toHaveBeenCalledWith('/api', expect.objectContaining({
-        get: expect.any(Function),
-        post: expect.any(Function),
-        use: expect.any(Function)
-      }));
+
+      expect(setupRoutes).toHaveBeenCalledWith({
+        express: app.express,
+        db: app.db,
+        useCases: app.useCases
+      });
+    });
+  });
+
+
+  describe('setup', () => {
+    it('should complete full setup successfully', async () => {
+      const setupSpy = jest.spyOn(app, 'setupMiddleware');
+      const dbSpy = jest.spyOn(app, 'setupDatabase');
+      const useCasesSpy = jest.spyOn(app, 'setupUseCases');
+
+      const result = await app.setup();
+
+      expect(result).toBe(true);
+      expect(setupSpy).toHaveBeenCalled();
+      expect(dbSpy).toHaveBeenCalled();
+      expect(useCasesSpy).toHaveBeenCalled();
+      expect(setupRoutes).toHaveBeenCalledWith({
+        express: app.express,
+        db: app.db,
+        useCases: app.useCases
+      });
+    });
+
+    it('should return false when setup fails', async () => {
+      jest.spyOn(app, 'setupDatabase').mockRejectedValue(new Error('Setup failed'));
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const result = await app.setup();
+
+      expect(result).toBe(false);
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('initialize', () => {
+    it('should initialize successfully', async () => {
+      const setupSpy = jest.spyOn(app, 'setup').mockResolvedValue(true);
+      const startSpy = jest.spyOn(app, 'start').mockImplementation();
+
+      await app.initialize();
+
+      expect(setupSpy).toHaveBeenCalled();
+      expect(startSpy).toHaveBeenCalled();
+    });
+
+    it('should exit process when setup fails', async () => {
+      const setupSpy = jest.spyOn(app, 'setup').mockResolvedValue(false);
+      const processSpy = jest.spyOn(process, 'exit').mockImplementation();
+
+      await app.initialize();
+
+      expect(setupSpy).toHaveBeenCalled();
+      expect(processSpy).toHaveBeenCalledWith(1);
+      processSpy.mockRestore();
+    });
+  });
+
+  describe('start', () => {
+    it('should start server with configured port and host', () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      app.start();
+
+      expect(mockExpressInstance.listen).toHaveBeenCalledWith(
+        defaultConfig.port,
+        defaultConfig.host,
+        expect.any(Function)
+      );
+      consoleSpy.mockRestore();
+    });
+
+    it('should use default port and host when not configured', () => {
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      app.port = null;
+      app.host = null;
+
+      app.start();
+
+      expect(mockExpressInstance.listen).toHaveBeenCalledWith(
+        3001,
+        '0.0.0.0',
+        expect.any(Function)
+      );
+      consoleSpy.mockRestore();
     });
   });
 });

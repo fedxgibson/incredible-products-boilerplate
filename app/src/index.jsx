@@ -17,33 +17,20 @@ const swrConfig = {
 };
 
 const container = document.getElementById('root');
-
-console.log(container);
-
 const root = createRoot(container);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('root');
-  if(container) {
-    const root = createRoot(container);
-    root.render(<>hello world</>);
-  } else {
-    console.error('Root element not found');
-  }
-});
-
-// root.render(
-//   <React.StrictMode>
-//     <BrowserRouter>
-//       <SWRConfig value={swrConfig}>
-//         <AuthProvider>
-//           <NotificationProvider>
-//             <ModalProvider>
-//               <App />
-//             </ModalProvider>
-//           </NotificationProvider>
-//         </AuthProvider>
-//       </SWRConfig>
-//     </BrowserRouter>
-//   </React.StrictMode>
-// );
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <SWRConfig value={swrConfig}>
+        <AuthProvider>
+          <NotificationProvider>
+            <ModalProvider>
+              <App />
+            </ModalProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </SWRConfig>
+    </BrowserRouter>
+  </React.StrictMode>
+);

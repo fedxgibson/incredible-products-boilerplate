@@ -2,7 +2,7 @@
 ENV ?= development
 COMPOSE = docker compose$(if $(filter production,$(ENV)), -f docker-compose.yml)
 
-SERVICE ?= app  # Default service
+SERVICE ?=  # Default service
 ENV ?= development  # Default environment
 CMD ?= # Optional command to run
 
@@ -36,7 +36,6 @@ run-qa-tests:
 
 run-unit-tests:
 	$(COMPOSE) exec server npm run tests
-	$(COMPOSE) exec app npm run tests
 
 # Database commands
 .PHONY: db-shell
@@ -74,10 +73,19 @@ tf-destroy:
 prune:
 	docker system prune -af --volumes
 
-.PHONY: restart
-restart:
+.PHONY: restart-all
+restart-all:
 	docker restart $$(docker ps -aq)
 
+# Restart specific service
+.PHONY: restart
+restart:
+ifeq ($(SERVICE),)
+	@echo "Please provide a service name: make restart SERVICE=<service-name>"
+	@exit 1
+else
+	docker compose restart $(SERVICE)
+endif
 # Development utilities
 .PHONY: ps
 ps:

@@ -1,6 +1,6 @@
 FROM node:18-slim
 
-# Instalar dependencias necesarias para Puppeteer
+# Install dependencies for Puppeteer
 RUN apt-get update && apt-get install -y \
     chromium \
     libpangocairo-1.0-0 \
@@ -17,22 +17,35 @@ RUN apt-get update && apt-get install -y \
     libasound2 \
     libatk1.0-0 \
     libgtk-3-0 \
-    libgbm-dev
+    libgbm-dev \
+    dbus \
+    dbus-x11 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create dbus configuration
-RUN mkdir -p /var/run/dbus && \
-    dbus-uuidgen > /var/lib/dbus/machine-id
+# Set up D-Bus system daemon
+RUN mkdir -p /var/run/dbus \
+    && mkdir -p /var/run/dbus/system_bus_socket \
+    && dbus-uuidgen > /var/lib/dbus/machine-id \
+    && chmod -R 755 /var/run/dbus
 
-# Configurar variables de entorno para Puppeteer
+# Configure environment variables for Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/var/run/dbus/system_bus_socket
 
 WORKDIR /app
 
+# Copy and install dependencies
 COPY package*.json ./
 RUN npm install
-RUN service dbus start
 
+# Copy application files
 COPY . .
 
+# Create entrypoint script
+RUN echo '#!/bin/bash\ndbus-daemon --system --fork\nexec "$@"' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]

@@ -27,7 +27,9 @@ services:
       - PORT=3001
       - HOST=0.0.0.0
       - MONGO_URI=mongodb://mongodb:27017
-      - MONTO_DB=app
+      - MONGO_DB=app
+      - JWT_SECRET=asfasfsasdiojo
+      - JWT_EXPIRES_IN=1h
     depends_on:
       - mongodb
     restart: unless-stopped
@@ -52,6 +54,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+
+  terraform:
+    image: hashicorp/terraform:latest
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    entrypoint: [""]
+    command: tail -f /dev/null 
 
 volumes:
   mongodb_data:

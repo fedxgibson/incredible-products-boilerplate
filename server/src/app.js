@@ -1,25 +1,28 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const MongoDBConnection = require('./frameworks/mongodb/connection');
-const UserRepository = require('./interfaces/repositories/user-repository');
+const MongoDBConnection = require('./mongodb/connection');
+const UserRepository = require('./repositories/user-repository');
 const CreateUserUseCase = require('./use-cases/user/create-user');
-const UserController = require('./interfaces/controllers/user-controller');
-const userRoutes = require('./frameworks/web/routes/user-routes');
+const LoginUserUseCase = require('./use-cases/auth/login-user');
+const setupRoutes = require('./http/routes');
 
 module.exports = class App {
   constructor(opts) {
     this.express = express();
-    this.port = opts.PORT;
-    this.host = opts.HOST;
-    this.mongoUri = opts.MONGO_URI;
-    this.mongoDb = opts.MONGO_DB;
-    this.database = new MongoDBConnection(opts.MONGO_URI, opts.MONGO_DB);
+    this.port = opts.port;
+    this.host = opts.host;
+    this.mongoUri = opts.mongoUri;
+    this.mongoDb = opts.mongoDb;
+    this.jwtSecret = opts.jwtSecret;
+    this.jwtExpiresIn = opts.jwtExpiresIn;
+    this.database = new MongoDBConnection(opts.mongoUri, opts.mongoDb);
   }
 
   async setup() {
     try {
       this.setupMiddleware();
       await this.setupDatabase();
+      this.setupUseCases();
       this.setupRoutes();
       return true;
     } catch (error) {
@@ -53,16 +56,26 @@ module.exports = class App {
     }
   }
 
-  setupRoutes() {
-    if (!this.db) {
-      throw new Error('Database connection not established');
-    }
-
+  setupUseCases() {
     const userRepository = new UserRepository(this.db);
-    const createUserUseCase = new CreateUserUseCase(userRepository);
-    const userController = new UserController(createUserUseCase);
 
-    this.express.use('/api', userRoutes(userController));
+    this.useCases = {
+      createUserUseCase: new CreateUserUseCase(userRepository),
+      loginUserUseCase: new LoginUserUseCase(userRepository,
+         {
+          jwtSecret: this.jwtSecret,
+          jwtExpiresIn: this.jwtExpiresIn
+         }
+        )
+    }
+  }
+
+  setupRoutes () {
+    setupRoutes({
+      express: this.express,
+      db: this.db,
+      useCases: this.useCases
+    });
   }
 
   start() {

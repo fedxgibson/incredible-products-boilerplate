@@ -2,9 +2,8 @@
   "name": "qa-testing",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest",
     "test:watch": "jest --watch",
-    "test:e2e": "jest -c jest.config.js",
+    "tests": "jest -c jest.config.js",
     "test:e2e:watch": "jest -c jest.config.js --watch",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },

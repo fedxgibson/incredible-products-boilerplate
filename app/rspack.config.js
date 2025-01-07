@@ -6,10 +6,12 @@ const rspack = require('@rspack/core');
  */
 module.exports = {
   plugins: [
-    new rspack.HtmlRspackPlugin(),
+    new rspack.HtmlRspackPlugin({
+      template: path.resolve(__dirname, 'public/index.html'),  // Add this line
+      inject: true
+    }),
     new rspack.DefinePlugin({
-      'process.env': JSON.stringify(process.env),
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env': JSON.stringify(process.env)
     }),
   ],
   experiments: {

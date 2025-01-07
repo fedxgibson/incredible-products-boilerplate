@@ -3,15 +3,17 @@ module.exports = {
     dumpio: true,
     headless: 'new',
     args: [
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-setuid-sandbox',
       '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-software-rasterizer',
+      '--proxy-server="direct://"',
+      '--proxy-bypass-list=*',
+      '--no-single-process',
       '--no-zygote',
-      '--single-process',
-      '--disable-features=VizDisplayCompositor',
-      '--disable-features=IsolateOrigins',
-      '--disable-site-isolation-trials'
+      '--deterministic-fetch',
+      '--disable-features=IsolateOrigins,site-per-process'
     ],
     ignoreDefaultArgs: ['--disable-extensions']
   }

@@ -1,0 +1,63 @@
+%%{init: {
+    'theme': 'base', 
+    'themeVariables': { 
+        'primaryTextColor': '#000000',
+        'primaryColor': '#000000',
+        'noteTextColor': '#000000',
+        'actorTextColor': '#000000',
+        'signalColor': '#000000',
+        'signalTextColor': '#000000',
+        'labelTextColor': '#000000',
+        'loopTextColor': '#000000',
+        'textColor': '#000000',
+        'actorBkg': '#ffffff',
+        'actorBorder': '#000000'
+    }
+}}%%
+sequenceDiagram
+    participant User
+    participant WebApp
+    participant Server
+
+    %% Registration Flow
+    rect rgb(200, 220, 240)
+    Note over User,Server: Registration Flow
+    User->>WebApp: Navigate to /register
+    User->>WebApp: Fill registration form
+    Note right of User: username, email, password, confirmPassword
+    WebApp->>Server: Submit registration data
+    Server->>WebApp: Return success response
+    WebApp->>WebApp: Redirect to /login
+    end
+
+    %% Successful Login Flow
+    rect rgb(200, 240, 200)
+    Note over User,Server: Successful Login Flow
+    User->>WebApp: Navigate to /login
+    User->>WebApp: Fill login form
+    Note right of User: email, password, rememberMe
+    WebApp->>Server: Submit login credentials
+    Server->>WebApp: Return success response
+    WebApp->>User: Redirect to home (/)
+    end
+
+    %% Failed Login Flow
+    rect rgb(240, 200, 200)
+    Note over User,Server: Failed Login Flow
+    User->>WebApp: Navigate to /login
+    User->>WebApp: Fill invalid credentials
+    Note right of User: wrong email/password
+    WebApp->>Server: Submit invalid credentials
+    Server->>WebApp: Return error response
+    WebApp->>User: Show error notification
+    end
+
+    %% Form Validation Flow
+    rect rgb(240, 220, 200)
+    Note over User,Server: Form Validation Flow
+    User->>WebApp: Navigate to /login
+    User->>WebApp: Submit empty form
+    WebApp->>WebApp: Validate fields
+    WebApp->>User: Show validation errors
+    Note right of WebApp: Email and Password required
+    end

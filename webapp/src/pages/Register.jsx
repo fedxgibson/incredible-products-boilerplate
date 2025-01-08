@@ -80,6 +80,7 @@ const Register = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <Input
+            data-test-id="username-input"
             label="Username"
             name="username"
             type="text"
@@ -88,9 +89,11 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.username && errors.username}
+            error-id="username-error"
           />
 
           <Input
+            data-test-id="email-input"
             label="Email"
             name="email"
             type="email"
@@ -99,9 +102,11 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.email && errors.email}
+            error-id="email-error"
           />
 
           <Input
+            data-test-id="password-input"
             label="Password"
             name="password"
             type="password"
@@ -110,9 +115,11 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.password && errors.password}
+            error-id="password-error"
           />
 
           <Input
+            data-test-id="confirm-password-input"
             label="Confirm Password"
             name="confirmPassword"
             type="password"
@@ -121,9 +128,11 @@ const Register = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.confirmPassword && errors.confirmPassword}
+            error-id="confirm-password-error"
           />
 
           <button
+            data-test-id="register-submit"
             type="submit"
             disabled={isSubmitting}
             className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
@@ -135,6 +144,7 @@ const Register = () => {
 
           <div className="text-center mt-4">
             <Link
+              data-test-id="login-link"
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-500"
             >

@@ -1,3 +1,4 @@
+// Login.jsx component
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -41,14 +42,13 @@ const Login = () => {
 
   const onSubmit = async (formData) => {
     try {
-      const response = await api.post('/auth/login', formData);
+      const response = await api.post('/login', formData);
       login(response.data.token);
       addNotification('Successfully logged in', 'success');
       navigate('/');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       addNotification(errorMessage, 'error');
-      throw error;
     }
   };
 
@@ -63,6 +63,7 @@ const Login = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <Input
+            data-test-id="email-input"
             label="Email"
             name="email"
             type="email"
@@ -72,9 +73,11 @@ const Login = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.email && errors.email}
+            error-id="email-error"
           />
 
           <Input
+            data-test-id="password-input"
             label="Password"
             name="password"
             type="password"
@@ -84,11 +87,13 @@ const Login = () => {
             onChange={handleChange}
             onBlur={handleBlur}
             error={touched.password && errors.password}
+            error-id="password-error"
           />
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
+                data-test-id="remember-me"
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
@@ -100,7 +105,11 @@ const Login = () => {
             </div>
 
             <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link 
+                data-test-id="forgot-password-link"
+                to="/forgot-password" 
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
                 Forgot your password?
               </Link>
             </div>
@@ -108,6 +117,7 @@ const Login = () => {
 
           <div>
             <button
+              data-test-id="login-submit"
               type="submit"
               disabled={isSubmitting}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
@@ -120,6 +130,7 @@ const Login = () => {
 
           <div className="text-center mt-4">
             <Link
+              data-test-id="register-link"
               to="/register"
               className="font-medium text-blue-600 hover:text-blue-500"
             >

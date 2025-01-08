@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const MongoDBConnection = require('../src/mongodb/connection');
 const UserRepository = require('../src/repositories/user-repository');
-const CreateUserUseCase = require('../src/use-cases/user/create-user');
-const LoginUserUseCase = require('../src/use-cases/auth/login-user');
+const CreateUserUseCase = require('../src/use-cases/create-user');
+const LoginUserUseCase = require('../src/use-cases/login-user');
 const setupRoutes = require('../src/http/routes');
 const App = require('../src/app');
 
@@ -22,10 +24,12 @@ jest.mock('body-parser', () => ({
   json: jest.fn()
 }));
 
+jest.mock('cors', () => jest.fn());
+jest.mock('morgan', () => jest.fn());
 jest.mock('../src/mongodb/connection');
 jest.mock('../src/repositories/user-repository');
-jest.mock('../src/use-cases/user/create-user');
-jest.mock('../src/use-cases/auth/login-user');
+jest.mock('../src/use-cases/create-user');
+jest.mock('../src/use-cases/login-user');
 jest.mock('../src/http/routes', () => {
   return jest.fn()
 });
@@ -40,6 +44,7 @@ describe('App', () => {
     host: 'localhost',
     mongoUri: 'mongodb://localhost:27017',
     mongoDb: 'testdb',
+    origin: 'localhost:3001',
     jwtSecret: 'random',
     jwtExpiresIn: '1h'
   };
@@ -93,6 +98,18 @@ describe('App', () => {
 
     it('should setup body-parser middleware', () => {
       expect(bodyParser.json).toHaveBeenCalled();
+      expect(mockExpressInstance.use).toHaveBeenCalled();
+    });
+
+    it('should setup cors middleware', () => {
+      expect(cors).toHaveBeenCalledWith({
+        origin: app.origin
+      });
+      expect(mockExpressInstance.use).toHaveBeenCalled();
+    });
+
+    it('should setup logger middleware', () => {
+      expect(morgan).toHaveBeenCalledWith('combined');
       expect(mockExpressInstance.use).toHaveBeenCalled();
     });
 
@@ -170,7 +187,6 @@ describe('App', () => {
       app.setupRoutes();
 
       expect(setupRoutes).toHaveBeenCalledWith({
-        express: app.express,
         db: app.db,
         useCases: app.useCases
       });
@@ -191,7 +207,6 @@ describe('App', () => {
       expect(dbSpy).toHaveBeenCalled();
       expect(useCasesSpy).toHaveBeenCalled();
       expect(setupRoutes).toHaveBeenCalledWith({
-        express: app.express,
         db: app.db,
         useCases: app.useCases
       });

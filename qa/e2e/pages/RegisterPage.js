@@ -1,30 +1,27 @@
-// LoginPage.js page object
-module.exports = class LoginPage {
+// pages/RegisterPage.js
+module.exports = class RegisterPage {
   constructor(page) {
     this.page = page;
     this.selectors = {
+      usernameInput: '[data-test-id="username-input"]',
       emailInput: '[data-test-id="email-input"]',
       passwordInput: '[data-test-id="password-input"]',
-      submitButton: '[data-test-id="login-submit"]',
-      rememberMeCheckbox: '[data-test-id="remember-me"]',
-      forgotPasswordLink: '[data-test-id="forgot-password-link"]',
-      registerLink: '[data-test-id="register-link"]',
+      confirmPasswordInput: '[data-test-id="confirm-password-input"]',
+      submitButton: '[data-test-id="register-submit"]',
+      loginLink: '[data-test-id="login-link"]',
       notificationMessage: '[data-test-id="notification"]'
     };
   }
 
   async navigate() {
-    await this.page.goto(`${process.env.BASE_URL}/login`);
+    await this.page.goto(`${process.env.BASE_URL}/register`);
   }
 
-  async login({ email, password, rememberMe = false }) {
+  async register({ username, email, password, confirmPassword }) {
+    await this.page.type(this.selectors.usernameInput, username);
     await this.page.type(this.selectors.emailInput, email);
     await this.page.type(this.selectors.passwordInput, password);
-    
-    if (rememberMe) {
-      await this.page.click(this.selectors.rememberMeCheckbox);
-    }
-    
+    await this.page.type(this.selectors.confirmPasswordInput, confirmPassword);
     await this.page.click(this.selectors.submitButton);
   }
 
@@ -46,12 +43,8 @@ module.exports = class LoginPage {
     }
   }
 
-  async clickForgotPassword() {
-    await this.page.click(this.selectors.forgotPasswordLink);
-  }
-
-  async clickRegister() {
-    await this.page.click(this.selectors.registerLink);
+  async clickLoginLink() {
+    await this.page.click(this.selectors.loginLink);
   }
 
   async getFieldError(fieldName) {
@@ -64,7 +57,7 @@ module.exports = class LoginPage {
     }
   }
 
-  async waitForSuccessfulLogin() {
+  async waitForSuccessfulRegistration() {
     await Promise.race([
       this.page.waitForNavigation(),
       this.page.waitForSelector(this.selectors.notificationMessage)

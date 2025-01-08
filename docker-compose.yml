@@ -1,18 +1,18 @@
 # docker-compose.yml (Production - base file)
 services:
-  app:
+  webapp:
     build:
-      context: app
+      context: webapp
       target: runner
     ports:
       - "3000:3000"
     environment:
-      - API_URL=http://server:3001/api
+      - API_URL=http://localhost:3001/api
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET:-random}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/login"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -28,13 +28,14 @@ services:
       - HOST=0.0.0.0
       - MONGO_URI=mongodb://mongodb:27017
       - MONGO_DB=app
+      - ORIGIN=http://localhost:3000
       - JWT_SECRET=asfasfsasdiojo
       - JWT_EXPIRES_IN=1h
     depends_on:
       - mongodb
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
       retries: 3

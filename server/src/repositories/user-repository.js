@@ -18,4 +18,8 @@ module.exports = class UserRepository {
     const objectId = id instanceof ObjectId ? id : new ObjectId(id);
     return this.database.collection('users').findOne({ _id: objectId });
   }
+
+  async findByEmail(email) {
+    return this.database.collection('users').findOne({ email });
+  }
 }

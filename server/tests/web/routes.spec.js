@@ -37,7 +37,7 @@ describe('Router Setup', () => {
     it('should set up routes with provided dependencies', () => {
       const deps = {
         useCases: {
-          CreateUserUseCase: mockCreateUserUseCase,
+        	createUserUseCase: mockCreateUserUseCase,
           loginUserUseCase: mockLoginUserUseCase
         }
       };
@@ -74,7 +74,7 @@ describe('Router Setup', () => {
     beforeEach(() => {
       const deps = {
         useCases: {
-          CreateUserUseCase: mockCreateUserUseCase,
+          createUserUseCase: mockCreateUserUseCase,
           loginUserUseCase: mockLoginUserUseCase
         }
       };

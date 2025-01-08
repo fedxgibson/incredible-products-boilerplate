@@ -1,47 +1,109 @@
-// specs/auth.spec.js
-const LoginPage = require('../pages/LoginPage')
-const SignupPage = require('../pages/SignupPage')
+const takeScreenshot = require('../../../utils/screenshot');
+const LoginPage = require('../../pages/LoginPage');
+const RegisterPage = require('../../pages/RegisterPage'); // Note: Changed from SignupPage to match your components
 
 describe('Authentication Flows', () => {
   let loginPage;
-  let signupPage;
+  let registerPage;
+
+  const testUser = {
+    username: `TestUser${Date.now()}`,
+    email: `test${Date.now()}@example.com`,
+    password: 'newPassword123',
+    confirmPassword: 'newPassword123'  // Added this to match your register form
+  };
 
   beforeEach(async () => {
     loginPage = new LoginPage(page);
-    signupPage = new SignupPage(page);
+    registerPage = new RegisterPage(page);
+  });
+
+  describe('Registration Flow', () => {  // Changed from Signup to Register to match your components
+    it('should successfully create new account', async () => {
+      await registerPage.navigate();
+      await takeScreenshot(page, 'register-initial');
+
+      await registerPage.register({
+        username: testUser.username,
+        email: testUser.email,
+        password: testUser.password,
+        confirmPassword: testUser.confirmPassword
+      });
+
+      await takeScreenshot(page, 'register-submitted');
+
+      // Wait for notification or redirect
+      await registerPage.waitForSuccessfulRegistration();
+      
+      // Verify successful registration redirects to login
+      await expect(page).toHaveURL('/login');
+      const notificationMessage = await registerPage.getNotificationMessage();
+      expect(notificationMessage).toContain('Successfully registered');
+
+      await takeScreenshot(page, 'register-complete');
+    });
   });
 
   describe('Login Flow', () => {
     it('should successfully login with valid credentials', async () => {
       await loginPage.navigate();
-      await loginPage.login(testUsers.valid.email, testUsers.valid.password);
+      await takeScreenshot(page, 'login-initial');
+
+      await loginPage.login({
+        email: testUser.email,
+        password: testUser.password,
+        rememberMe: true  // Optional, set to true to test remember me functionality
+      });
+
+      await takeScreenshot(page, 'login-submitted');
+
+      // Wait for login completion
+      await loginPage.waitForSuccessfulLogin();
       
       // Verify successful login
-      await expect(page).toHaveURL('/dashboard');
+      await expect(page).toHaveURL('/');  // Assuming redirect to home after login
+      const notificationMessage = await loginPage.getNotificationMessage();
+      expect(notificationMessage).toContain('Successfully logged in');
+
+      await takeScreenshot(page, 'login-complete');
     });
 
     it('should show error with invalid credentials', async () => {
       await loginPage.navigate();
-      await loginPage.login(testUsers.invalid.email, testUsers.invalid.password);
-      
-      const errorMessage = await loginPage.getErrorMessage();
-      expect(errorMessage).toContain('Invalid credentials');
+      await takeScreenshot(page, 'login-error-initial');
+
+      await loginPage.login({
+        email: 'wrong@example.com',
+        password: 'wrongpassword'
+      });
+
+      await takeScreenshot(page, 'login-error-submitted');
+
+      // Check for error notification
+      const notificationMessage = await loginPage.getNotificationMessage();
+      expect(notificationMessage).toContain('Login failed');
+
+      await takeScreenshot(page, 'login-error-complete');
     });
-  });
 
-  describe('Signup Flow', () => {
-    it('should successfully create new account', async () => {
-      const newUser = {
-        name: `Test User ${Date.now()}`,
-        email: `test${Date.now()}@example.com`,
-        password: 'newPassword123'
-      };
+    it('should validate form fields', async () => {
+      await loginPage.navigate();
+      await takeScreenshot(page, 'login-validation-initial');
 
-      await signupPage.navigate();
-      await signupPage.signup(newUser);
+      // Try to submit empty form
+      await loginPage.login({
+        email: '',
+        password: ''
+      });
+
+      // Check for field errors
+      const emailError = await loginPage.getFieldError('email');
+      const passwordError = await loginPage.getFieldError('password');
       
-      // Verify successful signup
-      await expect(page).toHaveURL('/onboarding');
+      expect(emailError).toContain('Email is required');
+      expect(passwordError).toContain('Password is required');
+
+      await takeScreenshot(page, 'login-validation-errors');
     });
   });
 });

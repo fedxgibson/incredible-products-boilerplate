@@ -1,5 +1,5 @@
-const CreateUserUseCase = require('../../../src/use-cases/user/create-user');
-const User = require('../../../src/entities/user');
+const CreateUserUseCase = require('../../src/use-cases/create-user');
+const User = require('../../src/entities/user');
 
 describe('CreateUserUseCase', () => {
   let userRepository;

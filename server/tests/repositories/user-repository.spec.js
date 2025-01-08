@@ -70,4 +70,35 @@ describe('UserRepository', () => {
       expect(user).toBeNull();
     });
   });
+
+  describe('findByEmail', () => {
+    it('should find a user by email', async () => {
+      const userEmail = 'john@example.com';
+      const expectedUser = {
+        _id: new ObjectId('123456789012345678901234'),
+        name: 'John Doe',
+        email: userEmail,
+      };
+  
+      collectionMock.findOne.mockResolvedValue(expectedUser);
+  
+      const user = await userRepository.findByEmail(userEmail);
+  
+      expect(database.collection).toHaveBeenCalledWith('users');
+      expect(collectionMock.findOne).toHaveBeenCalledWith({ email: userEmail });
+      expect(user).toEqual(expectedUser);
+    });
+  
+    it('should return null when user is not found', async () => {
+      const userEmail = 'nonexistent@example.com';
+      
+      collectionMock.findOne.mockResolvedValue(null);
+  
+      const user = await userRepository.findByEmail(userEmail);
+  
+      expect(database.collection).toHaveBeenCalledWith('users');
+      expect(collectionMock.findOne).toHaveBeenCalledWith({ email: userEmail });
+      expect(user).toBeNull();
+    });
+  });
 });

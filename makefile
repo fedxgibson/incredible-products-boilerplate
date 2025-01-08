@@ -15,7 +15,7 @@ up:
 	$(COMPOSE) up -d
 
 down:
-	$(COMPOSE) down
+	$(COMPOSE) down --remove-orphans
 
 logs:
 	$(COMPOSE) logs -f $(SERVICE)
@@ -124,7 +124,7 @@ help:
 	@echo "Examples:"
 	@echo "  make up                     # Start development environment"
 	@echo "  make up ENV=production      # Start production environment"
-	@echo "  make logs SERVICE=app       # View app service logs"
+	@echo "  make logs SERVICE=webapp       # View webapp service logs"
 	@echo "  make shell SERVICE=server   # Open shell in server container"
 
 .DEFAULT_GOAL := help

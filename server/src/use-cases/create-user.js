@@ -1,4 +1,4 @@
-const User = require('../../entities/user');
+const User = require('../entities/user');
 
 module.exports = class CreateUserUseCase {
   constructor(userRepository) {

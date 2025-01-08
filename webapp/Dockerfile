@@ -1,5 +1,11 @@
 FROM node:lts-alpine AS base
 
+RUN apk add --no-cache \
+    curl \
+    bind-tools \
+    iputils \
+    net-tools
+
 # Stage 1: Install dependencies
 FROM base AS deps
 WORKDIR /app

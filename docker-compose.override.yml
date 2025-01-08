@@ -1,14 +1,14 @@
 services:
-  app:
+  webapp:
     build:
-      context: ./app
+      context: ./webapp
       target: deps
     environment:
       - NODE_ENV=development
     command: npm run dev
     volumes:
-      - ./app:/app:rw
-      - app_node_modules:/app/node_modules:rw
+      - ./webapp:/app:rw
+      - webapp_node_modules:/app/node_modules:rw
   
   server:
     build:
@@ -29,9 +29,10 @@ services:
       - qa_node_modules:/app/node_modules:rw
       - /var/run/dbus:/var/run/dbus
     depends_on:
-      - app
+      - webapp
+      - server
     environment:
-      - BASE_URL=http://app:3000
+      - BASE_URL=http://webapp:3000
       - NODE_ENV=test
       - JEST_PUPPETEER_CONFIG=puppeteer.config.js
     tmpfs:
@@ -39,5 +40,5 @@ services:
     
 volumes:
   qa_node_modules:
-  app_node_modules:
+  webapp_node_modules:
   server_node_modules:

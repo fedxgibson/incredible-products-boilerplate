@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const LoginUserUseCase = require('../../../src/use-cases/auth/login-user');
+const LoginUserUseCase = require('../../src/use-cases/login-user');
 
 jest.mock('jsonwebtoken', () => ({
   sign: jest.fn()

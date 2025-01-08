@@ -7,6 +7,7 @@ const app = new App({
   mongoDb: process.env.MONGO_DB,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
+  origin: process.env.ORIGIN,
 });
 
 app.initialize();

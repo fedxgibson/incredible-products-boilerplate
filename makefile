@@ -6,7 +6,7 @@ SERVICE ?=  # Default service
 ENV ?= development  # Default environment
 CMD ?= # Optional command to run
 
-.PHONY: build up down logs shell exec
+.PHONY: build up down logs shell
 
 build:
 	$(COMPOSE) build
@@ -41,7 +41,7 @@ run-unit-tests:
 .PHONY: db-shell
 
 db-shell:
-	$(COMPOSE) exec db mongosh
+	$(COMPOSE) exec mongodb mongosh app
 
 .PHONY: seed
 seed:

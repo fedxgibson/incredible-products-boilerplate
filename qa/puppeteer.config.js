@@ -2,7 +2,8 @@ module.exports = {
   launch: {
     dumpio: true,
     ignoreHTTPSErrors: true,
-    headless: 'new',
+    headless: process.env.HEADLESS || 'new',
+    devtools: true,
     args: [
       // Your existing args
       '--no-sandbox',
@@ -23,7 +24,10 @@ module.exports = {
       '--disable-web-security',
       '--disable-features=IsolateOrigins',
       '--disable-site-isolation-trials',
-      '--disable-features=BlockInsecurePrivateNetworkRequests'
+      '--disable-features=BlockInsecurePrivateNetworkRequests',
+      '--auto-open-devtools-for-tabs',  // This will auto-open DevTools
+      '--remote-debugging-address=0.0.0.0',
+      '--remote-debugging-port=9222'
     ],
     ignoreDefaultArgs: ['--disable-extensions']
   }

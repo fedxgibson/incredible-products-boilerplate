@@ -6,9 +6,9 @@ import useForm from '../hooks/useForm';
 import api from '../api/axios';
 
 const validators = {
-  username: (value) => {
-    if (!value) return 'Username is required';
-    if (value.length < 3) return 'Username must be at least 3 characters';
+  name: (value) => {
+    if (!value) return 'name is required';
+    if (value.length < 3) return 'name must be at least 3 characters';
     return '';
   },
   email: (value) => {
@@ -42,7 +42,7 @@ const Register = () => {
     handleSubmit 
   } = useForm(
     {
-      username: '',
+      name: '',
       email: '',
       password: '',
       confirmPassword: ''
@@ -52,10 +52,11 @@ const Register = () => {
 
   const onSubmit = async (formData) => {
     try {
-      await api.post('/auth/register', {
-        username: formData.username,
+      await api.post('/register', {
+        name: formData.name,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
       
       addNotification('Successfully registered. Please sign in.', 'success');
@@ -65,7 +66,6 @@ const Register = () => {
         error.response?.data?.message || 'Registration failed',
         'error'
       );
-      throw error;
     }
   };
 
@@ -80,16 +80,16 @@ const Register = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <Input
-            data-test-id="username-input"
-            label="Username"
-            name="username"
+            data-test-id="name-input"
+            label="name"
+            name="name"
             type="text"
             required
-            value={values.username}
+            value={values.name}
             onChange={handleChange}
             onBlur={handleBlur}
-            error={touched.username && errors.username}
-            error-id="username-error"
+            error={touched.name && errors.name}
+            error-id="name-error"
           />
 
           <Input

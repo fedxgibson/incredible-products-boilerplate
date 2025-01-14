@@ -5,7 +5,7 @@
     "test:watch": "jest --watch",
     "tests": "jest -c jest.config.js",
     "test:e2e:watch": "jest -c jest.config.js --watch",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
+    "test:debug": "DEBUG=true HEADLESS=false NODE_OPTIONS='--inspect=0.0.0.0:9229' jest --runInBand --config=jest.config.js"
   },
   "dependencies": {
     "puppeteer": "^21.5.0"

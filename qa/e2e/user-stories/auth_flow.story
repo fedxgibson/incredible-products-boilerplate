@@ -6,7 +6,7 @@ So that I can access the platform's features
 
 Acceptance Criteria:
 - I can navigate to the registration page
-- I can fill in my username, email, and password
+- I can fill in my name, email, and password
 - I must confirm my password
 - Upon successful registration, I am redirected to the login page
 - I receive a success message after registration

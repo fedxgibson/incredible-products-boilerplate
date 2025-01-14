@@ -15,6 +15,7 @@ services:
       context: ./server
     environment:
       - NODE_ENV=development
+      - LOG_LEVEL=debug
     command: npm run dev
     volumes:
       - ./server:/app:rw
@@ -36,7 +37,10 @@ services:
       - NODE_ENV=test
       - JEST_PUPPETEER_CONFIG=puppeteer.config.js
     tmpfs:
-    - /tmp
+      - /tmp
+    ports:
+      - 9222:9222  # Chrome DevTools
+      - 9229:9229  # Node.js debugger
     
 volumes:
   qa_node_modules:

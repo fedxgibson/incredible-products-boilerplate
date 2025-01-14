@@ -50,7 +50,7 @@ const MainLayout = () => {
           <div className="p-4 border-t">
             <div className="flex items-center space-x-4">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-sm text-gray-500">{user?.email}</p>
               </div>
               <button

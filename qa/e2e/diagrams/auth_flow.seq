@@ -24,7 +24,7 @@ sequenceDiagram
     Note over User,Server: Registration Flow
     User->>WebApp: Navigate to /register
     User->>WebApp: Fill registration form
-    Note right of User: username, email, password, confirmPassword
+    Note right of User: name, email, password, confirmPassword
     WebApp->>Server: Submit registration data
     Server->>WebApp: Return success response
     WebApp->>WebApp: Redirect to /login

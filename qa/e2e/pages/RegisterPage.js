@@ -3,7 +3,7 @@ module.exports = class RegisterPage {
   constructor(page) {
     this.page = page;
     this.selectors = {
-      usernameInput: '[data-test-id="username-input"]',
+      nameInput: '[data-test-id="name-input"]',
       emailInput: '[data-test-id="email-input"]',
       passwordInput: '[data-test-id="password-input"]',
       confirmPasswordInput: '[data-test-id="confirm-password-input"]',
@@ -17,8 +17,8 @@ module.exports = class RegisterPage {
     await this.page.goto(`${process.env.BASE_URL}/register`);
   }
 
-  async register({ username, email, password, confirmPassword }) {
-    await this.page.type(this.selectors.usernameInput, username);
+  async register({ name, email, password, confirmPassword }) {
+    await this.page.type(this.selectors.nameInput, name);
     await this.page.type(this.selectors.emailInput, email);
     await this.page.type(this.selectors.passwordInput, password);
     await this.page.type(this.selectors.confirmPasswordInput, confirmPassword);

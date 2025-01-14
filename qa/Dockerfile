@@ -43,4 +43,7 @@ COPY . .
 
 RUN chmod +x entrypoint.sh
 
+EXPOSE 9222
+EXPOSE 9229
+
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]

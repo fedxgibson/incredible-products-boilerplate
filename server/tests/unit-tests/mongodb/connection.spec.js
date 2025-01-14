@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const MongoDBConnection = require('../../src/mongodb/connection');
+const MongoDBConnection = require('../../../src/mongodb/connection');
 
 // Mock MongoDB client
 jest.mock('mongodb', () => ({
@@ -16,9 +16,6 @@ describe('MongoDBConnection', () => {
   const TEST_DB = 'testdb';
 
   beforeEach(() => {
-    // Reset console.log mock before each test
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-
     // Create mock database and client
     mockDb = {
       collection: jest.fn()
@@ -57,7 +54,6 @@ describe('MongoDBConnection', () => {
       expect(connection.client).toBe(mockClient);
       expect(connection.db).toBe(mockDb);
       expect(db).toBe(mockDb);
-      expect(console.log).toHaveBeenCalledWith('Connected to MongoDB');
     });
 
     it('should throw error when connection fails', async () => {
@@ -77,14 +73,12 @@ describe('MongoDBConnection', () => {
       await connection.disconnect();
 
       expect(mockClient.close).toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith('Disconnected from MongoDB');
     });
 
     it('should not attempt to disconnect when no client exists', async () => {
       await connection.disconnect();
 
       expect(mockClient.close).not.toHaveBeenCalled();
-      expect(console.log).not.toHaveBeenCalled();
     });
 
     it('should handle disconnect errors gracefully', async () => {

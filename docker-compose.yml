@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - API_URL=http://localhost:3001/api
+      - API_URL=http://localhost:3001/api/v1
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET:-random}
     restart: unless-stopped

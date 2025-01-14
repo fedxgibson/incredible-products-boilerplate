@@ -1,13 +1,13 @@
-const takeScreenshot = require('../../../utils/screenshot');
-const LoginPage = require('../../pages/LoginPage');
-const RegisterPage = require('../../pages/RegisterPage'); // Note: Changed from SignupPage to match your components
+const takeScreenshot = require('../../utils/screenshot');
+const LoginPage = require('../pages/LoginPage');
+const RegisterPage = require('../pages/RegisterPage'); // Note: Changed from SignupPage to match your components
 
 describe('Authentication Flows', () => {
   let loginPage;
   let registerPage;
 
   const testUser = {
-    username: `TestUser${Date.now()}`,
+    name: `TestUser${Date.now()}`,
     email: `test${Date.now()}@example.com`,
     password: 'newPassword123',
     confirmPassword: 'newPassword123'  // Added this to match your register form
@@ -24,7 +24,7 @@ describe('Authentication Flows', () => {
       await takeScreenshot(page, 'register-initial');
 
       await registerPage.register({
-        username: testUser.username,
+        name: testUser.name,
         email: testUser.email,
         password: testUser.password,
         confirmPassword: testUser.confirmPassword

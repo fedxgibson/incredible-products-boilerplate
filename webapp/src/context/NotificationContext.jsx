@@ -14,7 +14,7 @@ const NotificationComponent = ({ message, type, onClose }) => {
   return (
     <div className={`fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg transition-all transform animate-slide-up`}>
       <div className="flex items-center space-x-2">
-        <span>{message}</span>
+        <span data-test-id="notification">{message}</span>
         <button 
           onClick={onClose}
           className="ml-4 hover:text-gray-200"
@@ -36,7 +36,7 @@ export const NotificationProvider = ({ children }) => {
     // Auto remove after 5 seconds
     setTimeout(() => {
       removeNotification(id);
-    }, 5000);
+    }, 6000);
 
     return id;
   }, []);

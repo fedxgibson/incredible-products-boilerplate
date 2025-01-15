@@ -4,8 +4,6 @@ services:
     build:
       context: webapp
       target: runner
-    ports:
-      - "3000:3000"
     environment:
       - API_URL=http://localhost:3001/api/v1
       - NODE_ENV=production
@@ -20,8 +18,6 @@ services:
 
   server:
     build: ./server
-    ports:
-      - "3001:3001"
     environment:
       - NODE_ENV=production
       - PORT=3001
@@ -55,14 +51,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
-
-  terraform:
-    image: hashicorp/terraform:latest
-    volumes:
-      - .:/workspace
-    working_dir: /workspace
-    entrypoint: [""]
-    command: tail -f /dev/null 
 
 volumes:
   mongodb_data:

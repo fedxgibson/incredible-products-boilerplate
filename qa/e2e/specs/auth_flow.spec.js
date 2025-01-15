@@ -9,8 +9,8 @@ describe('Authentication Flows', () => {
   const testUser = {
     name: `TestUser${Date.now()}`,
     email: `test${Date.now()}@example.com`,
-    password: 'newPassword123',
-    confirmPassword: 'newPassword123'  // Added this to match your register form
+    password: 'newPassword123!',
+    confirmPassword: 'newPassword123!'  // Added this to match your register form
   };
 
   beforeEach(async () => {
@@ -34,13 +34,16 @@ describe('Authentication Flows', () => {
 
       // Wait for notification or redirect
       await registerPage.waitForSuccessfulRegistration();
-      
+      await takeScreenshot(page, 'register-complete');
+            
       // Verify successful registration redirects to login
-      await expect(page).toHaveURL('/login');
+      await page.waitForFunction(() => window.location.pathname === '/login');
+
       const notificationMessage = await registerPage.getNotificationMessage();
       expect(notificationMessage).toContain('Successfully registered');
 
-      await takeScreenshot(page, 'register-complete');
+
+      await takeScreenshot(page, 'register-success');
     });
   });
 
@@ -61,7 +64,7 @@ describe('Authentication Flows', () => {
       await loginPage.waitForSuccessfulLogin();
       
       // Verify successful login
-      await expect(page).toHaveURL('/');  // Assuming redirect to home after login
+      await page.waitForFunction(() => window.location.pathname === '/');
       const notificationMessage = await loginPage.getNotificationMessage();
       expect(notificationMessage).toContain('Successfully logged in');
 
@@ -77,7 +80,10 @@ describe('Authentication Flows', () => {
         password: 'wrongpassword'
       });
 
+      await page.waitForNetworkIdle();
+
       await takeScreenshot(page, 'login-error-submitted');
+      await page.waitForFunction(() => window.location.pathname === '/login');
 
       // Check for error notification
       const notificationMessage = await loginPage.getNotificationMessage();
@@ -95,7 +101,7 @@ describe('Authentication Flows', () => {
         email: '',
         password: ''
       });
-
+e
       // Check for field errors
       const emailError = await loginPage.getFieldError('email');
       const passwordError = await loginPage.getFieldError('password');

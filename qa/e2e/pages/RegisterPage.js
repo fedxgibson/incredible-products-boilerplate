@@ -39,6 +39,7 @@ module.exports = class RegisterPage {
       await this.page.waitForSelector(this.selectors.notificationMessage);
       return await this.page.$eval(this.selectors.notificationMessage, el => el.textContent);
     } catch (error) {
+      console.log(error)
       return null;
     }
   }

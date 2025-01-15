@@ -32,7 +32,7 @@ lint:
 	$(COMPOSE) exec qa npm run lint
 
 run-qa-tests:
-	$(COMPOSE) exec qa npm run tests
+	$(COMPOSE) exec qa npm run test:debug
 
 run-unit-tests:
 	$(COMPOSE) exec server npm run tests

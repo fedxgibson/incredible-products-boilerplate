@@ -34,7 +34,7 @@ const Input = ({
         {...props}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-500" role="alert">
+        <p className="mt-1 text-sm text-red-500" role="alert" data-test-id={`${name}-error`}>
           {error}
         </p>
       )}

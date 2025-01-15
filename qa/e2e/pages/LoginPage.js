@@ -24,7 +24,7 @@ module.exports = class LoginPage {
     if (rememberMe) {
       await this.page.click(this.selectors.rememberMeCheckbox);
     }
-    
+
     await this.page.click(this.selectors.submitButton);
   }
 

@@ -15,7 +15,7 @@ up:
 	$(COMPOSE) up -d
 
 down:
-	$(COMPOSE) down --remove-orphans
+	$(COMPOSE) down --remove-orphans $(SERVICE)
 
 logs:
 	$(COMPOSE) logs -f $(SERVICE)
@@ -32,6 +32,9 @@ lint:
 	$(COMPOSE) exec qa npm run lint
 
 run-qa-tests:
+	$(COMPOSE) exec qa npm run tests
+
+run-qa-tests-debug:
 	$(COMPOSE) exec qa npm run test:debug
 
 run-unit-tests:

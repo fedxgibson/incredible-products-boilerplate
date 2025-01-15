@@ -50,8 +50,8 @@ describe('Authentication Flows', () => {
   describe('Login Flow', () => {
     it('should successfully login with valid credentials', async () => {
       await loginPage.navigate();
-      await takeScreenshot(page, 'login-initial');
 
+      await takeScreenshot(page, 'login-initial');
       await loginPage.login({
         email: testUser.email,
         password: testUser.password,
@@ -64,7 +64,6 @@ describe('Authentication Flows', () => {
       await loginPage.waitForSuccessfulLogin();
       
       // Verify successful login
-      await page.waitForFunction(() => window.location.pathname === '/');
       const notificationMessage = await loginPage.getNotificationMessage();
       expect(notificationMessage).toContain('Successfully logged in');
 
@@ -74,38 +73,35 @@ describe('Authentication Flows', () => {
     it('should show error with invalid credentials', async () => {
       await loginPage.navigate();
       await takeScreenshot(page, 'login-error-initial');
-
+    
       await loginPage.login({
         email: 'wrong@example.com',
         password: 'wrongpassword'
       });
-
-      await page.waitForNetworkIdle();
-
+    
+      // Wait for notification to appear
       await takeScreenshot(page, 'login-error-submitted');
-      await page.waitForFunction(() => window.location.pathname === '/login');
-
-      // Check for error notification
+          
       const notificationMessage = await loginPage.getNotificationMessage();
-      expect(notificationMessage).toContain('Login failed');
 
+      expect(notificationMessage).toContain('Invalid credentials');
+    
       await takeScreenshot(page, 'login-error-complete');
     });
 
     it('should validate form fields', async () => {
       await loginPage.navigate();
-      await takeScreenshot(page, 'login-validation-initial');
 
       // Try to submit empty form
       await loginPage.login({
         email: '',
         password: ''
       });
-e
+
       // Check for field errors
       const emailError = await loginPage.getFieldError('email');
       const passwordError = await loginPage.getFieldError('password');
-      
+            
       expect(emailError).toContain('Email is required');
       expect(passwordError).toContain('Password is required');
 

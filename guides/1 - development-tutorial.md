@@ -125,67 +125,7 @@ module.exports = Task
 - No tiene dependencias externas
 - Es fácil de testear
 
-### 2. Repositories (Interfaces de Repositorio)
-**¿Qué son?**
-- Son interfaces que definen cómo se accederá a los datos
-- Actúan como contratos que las implementaciones deben seguir
-- No contienen lógica de acceso a datos, solo definen los métodos
-
-**¿Por qué los necesitamos?**
-- Permiten cambiar la implementación de acceso a datos sin afectar la lógica de negocio
-- Facilitan el testing al poder usar mocks fácilmente
-- Separan la lógica de negocio de la persistencia
-
-**Implementación:**
-```javascript
-// domain/repositories/TaskRepository.js
-class TaskRepository {
-  /**
-   * Guarda una tarea en el almacenamiento
-   * @param {Task} task - Instancia de tarea a guardar
-   * @returns {Promise<void>}
-   */
-  async save(task) {
-    throw new Error('Method not implemented')
-  }
-
-  /**
-   * Busca una tarea por su ID
-   * @param {string} id - ID de la tarea
-   * @returns {Promise<Task|null>}
-   */
-  async findById(id) {
-    throw new Error('Method not implemented')
-  }
-
-  /**
-   * Obtiene todas las tareas
-   * @returns {Promise<Task[]>}
-   */
-  async findAll() {
-    throw new Error('Method not implemented')
-  }
-
-  /**
-   * Actualiza una tarea existente
-   * @param {Task} task - Tarea con los cambios
-   * @returns {Promise<void>}
-   */
-  async update(task) {
-    throw new Error('Method not implemented')
-  }
-}
-
-module.exports = TaskRepository
-```
-
-**Puntos Clave del Repositorio:**
-- Define métodos claros y específicos
-- Usa JSDoc para documentar parámetros y retornos
-- No implementa la lógica, solo define la interfaz
-- Incluye todos los métodos necesarios para la user story
-
-### 3. Use Cases (Casos de Uso)
+### 2. Use Cases (Casos de Uso)
 **¿Qué son?**
 - Implementan la lógica de negocio específica
 - Coordinan el flujo entre entidades y repositorios
@@ -319,7 +259,7 @@ module.exports = CreateTaskUseCase
 - Retorna resultados estructurados
 - Se centra en un único flujo de negocio
 
-### 4. Controllers (Controladores)
+### 3. Controllers (Controladores)
 **¿Qué son?**
 - Adaptan las peticiones HTTP a los casos de uso
 - Manejan la validación de entrada
@@ -455,7 +395,7 @@ module.exports = TaskController
 - Maneja errores de forma apropiada
 - Mantiene respuestas consistentes
 
-### 5. Routes (Rutas)
+### 4. Routes (Rutas)
 **¿Qué son?**
 - Definen los endpoints de la API
 - Conectan URLs con controladores
@@ -488,18 +428,13 @@ function setupTaskRoutes(router, taskController) {
 }
 
 module.exports = setup
+```
 
-[Contenido anterior se mantiene...]
-
-### 6. MongoDB Repository (Implementación Concreta)
+### 5. Repository
 **¿Qué es?**
-- Es la implementación concreta del repositorio para MongoDB
-- Traduce entre el dominio y la base de datos
-- Maneja detalles específicos de MongoDB
+- Definen cómo se accederá a los datos
 
 **¿Por qué es importante?**
-- Aísla los detalles de MongoDB del resto de la aplicación
-- Implementa el contrato definido en el repositorio
 - Maneja la persistencia real de los datos
 
 **Implementación Paso a Paso:**
@@ -665,7 +600,7 @@ class MongoTaskRepository extends TaskRepository {
 - Convierte entre documentos MongoDB y entidades
 - Implementa todas las operaciones CRUD necesarias
 
-### 7. App Setup (Configuración de la Aplicación)
+### 6. App Setup (Configuración de la Aplicación)
 **¿Qué es?**
 - Es el punto donde se conectan todas las capas
 - Configura la aplicación y sus dependencias
@@ -784,7 +719,7 @@ module.exports = Application
 - Maneja el ciclo de vida de la aplicación
 - Proporciona métodos de inicio y apagado
 
-### 8. Entry Point (Punto de Entrada)
+### 7. Entry Point (Punto de Entrada)
 **¿Qué es?**
 - El archivo principal que inicia la aplicación
 - Maneja la configuración del entorno
@@ -848,32 +783,30 @@ startServer()
 
 ### Estructura de Directorios
 ```
-src/
-├── domain/
-│   ├── entities/
-│   │   ├── Task.js
-│   │   └── __tests__/
-│   └── repositories/
-│       └── TaskRepository.js
-├── application/
-│   └── usecases/
-│       ├── CreateTask.js
-│       └── __tests__/
-├── interfaces/
-│   └── controllers/
-│       ├── TaskController.js
-│       └── __tests__/
-├── frameworks/
-│   ├── express/
-│   │   ├── app.js
-│   │   └── routes/
-│   └── mongodb/
-│       ├── connection.js
-│       ├── MongoTaskRepository.js
-│       └── __tests__/
-├── app/
-│   └── index.js
-└── index.js
+src
+├── app.js
+├── entities
+│   └── user.js
+├── frameworks
+│   ├── mongodb
+│   │   └── connection.js
+│   └── web
+│       └── routes
+│           └── user-routes.js
+├── interfaces
+│   ├── controllers
+│   │   ├── auth-controller.js
+│   │   └── user-controller.js
+│   └── repositories
+│       └── user-repository.js
+└── use-cases
+    ├── auth
+    │   └── login-user.js
+    └── user
+        └── create-user.js
+
+
+
 ```
 
 ### Flujo de Desarrollo TDD

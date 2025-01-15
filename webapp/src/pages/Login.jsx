@@ -41,7 +41,7 @@ const Login = () => {
   );
 
   const onSubmit = async (formData) => {
-    try {
+    try {      
       const response = await api.post('/login', formData);
       login(response.data.token);
       addNotification('Successfully logged in', 'success');
@@ -61,7 +61,12 @@ const Login = () => {
           </h2>
         </div>
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="mt-8 space-y-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit(onSubmit)(e);
+          }}>
           <Input
             data-test-id="email-input"
             label="Email"

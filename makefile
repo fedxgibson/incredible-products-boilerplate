@@ -3,7 +3,6 @@ ENV ?= development
 COMPOSE = docker compose$(if $(filter production,$(ENV)), -f docker-compose.yml)
 
 SERVICE ?=  # Default service
-ENV ?= development  # Default environment
 CMD ?= # Optional command to run
 
 .PHONY: build up down logs shell
@@ -24,7 +23,7 @@ shell:
 	$(COMPOSE) exec $(SERVICE) sh
 
 # Application commands
-.PHONY: lint
+.PHONY: lint run-qa-tests run-qa-tests-debug run-unit-tests tests-all
 
 lint:
 	$(COMPOSE) exec app npm run lint
@@ -39,6 +38,8 @@ run-qa-tests-debug:
 
 run-unit-tests:
 	$(COMPOSE) exec server npm run tests
+
+test-all: run-qa-tests run-unit-tests
 
 # Database commands
 .PHONY: db-shell

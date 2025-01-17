@@ -5,6 +5,12 @@ COMPOSE = docker compose$(if $(filter production,$(ENV)), -f docker-compose.yml)
 SERVICE ?=  # Default service
 CMD ?= # Optional command to run
 
+TERRAFORM_RUN = cd infra && docker build -t terraform-doctl . && \
+	docker run -it --rm \
+	-v $$(pwd):/infra \
+	-v $$(pwd)/digital-ocean-config.yml:/root/.config/doctl/config.yaml:ro \
+	terraform-doctl
+
 .PHONY: build up down logs shell
 
 build:
@@ -58,19 +64,22 @@ db-migrate:
 # Terraform commands
 .PHONY: tf-init
 tf-init:
-	cd infra && terraform init
+	$(TERRAFORM_RUN) bash -c "terraform init"
 
 .PHONY: tf-plan
 tf-plan:
-	cd infra && terraform plan
+	$(TERRAFORM_RUN) bash -c "terraform plan"
 
 .PHONY: tf-apply
 tf-apply:
-	cd infra && terraform apply
+	$(TERRAFORM_RUN) bash -c "terraform apply"
 
 .PHONY: tf-destroy
 tf-destroy:
-	cd infra && terraform destroy
+	$(TERRAFORM_RUN) bash -c "terraform destroy"
+
+tf-shell:
+	$(TERRAFORM_RUN) bash
 
 # General commands
 .PHONY: prune

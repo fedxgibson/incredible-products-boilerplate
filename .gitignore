@@ -49,3 +49,5 @@ terraform.tfvars.json
 
 combined.log
 error.log
+
+digital-ocean-config.yml

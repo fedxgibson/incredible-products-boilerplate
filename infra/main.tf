@@ -201,18 +201,6 @@ resource "digitalocean_app" "webapp" {
             max_age        = "24h"
           }
         }
-
-          rule {
-            component {
-              name = "server"
-            }
-            match {
-              path {
-                prefix = "/health"
-              }
-            }
-          }
-
         rule {
           component {
             name = "webapp"

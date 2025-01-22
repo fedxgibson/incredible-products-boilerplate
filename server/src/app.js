@@ -96,6 +96,9 @@ class App {
           }
         });
       } catch (error) {
+        this.logger.info('Server is unhealthy');
+        this.logger.info(error);
+
         res.status(503).json({ 
           status: 'error',
           timestamp: new Date().toISOString(),

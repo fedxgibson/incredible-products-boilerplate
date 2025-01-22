@@ -1,5 +1,6 @@
 # Provider configuration
 terraform {
+  required_version = ">= 1.0.0"
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
@@ -84,7 +85,6 @@ resource "digitalocean_app" "webapp" {
       dockerfile_path = "webapp/Dockerfile"
 
       http_port = 3000
-      internal_ports = [3000]
 
       health_check {
         http_path = "/login"
@@ -128,7 +128,6 @@ resource "digitalocean_app" "webapp" {
       dockerfile_path = "server/Dockerfile"
 
       http_port = 3001
-      internal_ports = [3001]
 
       health_check {
         http_path = "/health"
@@ -151,7 +150,7 @@ resource "digitalocean_app" "webapp" {
 
       env {
         key   = "ORIGIN"
-        value = "https://${digitalocean_app.webapp.default_ingress}"
+        value = "https://${var.app_name}.ondigitalocean.app"
       }
 
       env {
@@ -193,7 +192,6 @@ resource "digitalocean_app" "webapp" {
               prefix = "/api/v1"
             }
           }
-
           cors {
             allow_origins {
               exact = "https://${var.app_name}.ondigitalocean.app"
@@ -203,6 +201,17 @@ resource "digitalocean_app" "webapp" {
             max_age        = "24h"
           }
         }
+
+          rule {
+            component {
+              name = "server"
+            }
+            match {
+              path {
+                prefix = "/health"
+              }
+            }
+          }
 
         rule {
           component {

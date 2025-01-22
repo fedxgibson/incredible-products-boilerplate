@@ -96,8 +96,8 @@ class App {
           }
         });
       } catch (error) {
-        this.logger.info('Server is unhealthy');
-        this.logger.info(error);
+        this.logger.error('Server is unhealthy');
+        this.logger.error(error.stack)
 
         res.status(503).json({ 
           status: 'error',

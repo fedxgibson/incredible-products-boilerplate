@@ -17,6 +17,14 @@ module.exports = class MongoDBConnection {
     return this.db;
   }
 
+  async ping() {
+    if(this.db){
+      const result = await this.db.command({ ping: 1 });
+      if (result.ok) return true;
+    }
+    throw new Error('db not connected')
+  }
+
   async disconnect() {
     if (this.client) {
       await this.client.close();

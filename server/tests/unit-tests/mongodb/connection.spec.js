@@ -18,7 +18,8 @@ describe('MongoDBConnection', () => {
   beforeEach(() => {
     // Create mock database and client
     mockDb = {
-      collection: jest.fn()
+      collection: jest.fn(),
+      command: jest.fn(),
     };
 
     mockClient = {
@@ -92,6 +93,30 @@ describe('MongoDBConnection', () => {
       await expect(connection.disconnect()).rejects.toThrow('Disconnect failed');
     });
   });
+
+  describe('ping', () => {
+    it('should throw error if connect not called previously', async () => {
+      await expect(connection.ping()).rejects.toThrow('db not connected');
+    });
+
+    it('should send a ping to db and return ok if connected', async () => {
+      mockDb.command.mockResolvedValue({ ok: true})
+      await connection.connect();
+      const result = await connection.ping();
+
+      expect(mockDb.command).toHaveBeenCalledWith({ ping: 1});
+      expect(result).toBe(true);
+    });
+
+    it('should throw error if ping is not successfull', async () => {
+      mockDb.command.mockResolvedValue({ ok: false})
+      await connection.connect();
+      await expect(connection.ping()).rejects.toThrow('db not connected');
+      expect(mockDb.command).toHaveBeenCalledWith({ ping: 1});
+    })
+  })
+
+  
 
   describe('connection lifecycle', () => {
     it('should support multiple connect/disconnect cycles', async () => {

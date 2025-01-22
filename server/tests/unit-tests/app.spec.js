@@ -1,6 +1,5 @@
 const App = require('../../src/app');
 const express = require('express');
-const cors = require('cors');
 const MongoDBConnection = require('../../src/mongodb/connection');
 const UserRepository = require('../../src/repositories/user-repository');
 const CreateUserUseCase = require('../../src/use-cases/create-user');
@@ -8,7 +7,6 @@ const LoginUserUseCase = require('../../src/use-cases/login-user');
 
 // Mock dependencies
 jest.mock('express');
-jest.mock('cors');
 jest.mock('../../src/mongodb/connection');
 jest.mock('../../src/repositories/user-repository');
 jest.mock('../../src/use-cases/create-user');
@@ -192,28 +190,10 @@ describe('App', () => {
       app.setupMiddleware();
 
       // Verify all middleware was added
-      expect(mockUse).toHaveBeenCalledTimes(4); // helmet, bodyParser, cors, morgan
+      expect(mockUse).toHaveBeenCalledTimes(4); // helmet, bodyParser, morgan
       
       // Verify health check endpoint was setup
       expect(mockGet).toHaveBeenCalledWith('/health', expect.any(Function));
-    });
-
-    it('should configure cors with correct options', () => {
-      // Mock cors to return a middleware function
-      const mockCorsMiddleware = jest.fn();
-      cors.mockReturnValue(mockCorsMiddleware);
-
-      app.setupMiddleware();
-
-      // Verify cors was configured with correct options
-      expect(cors).toHaveBeenCalledWith({
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization']
-      });
-
-      // Verify the cors middleware was added to express
-      expect(mockUse).toHaveBeenCalledWith(mockCorsMiddleware);
     });
   });
 

@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const winston = require('winston');
@@ -70,11 +69,6 @@ class App {
   setupMiddleware() {
     this.express.use(helmet());
     this.express.use(bodyParser.json());
-    this.express.use(cors({ 
-      origin: this.origin,
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization']
-    }));
     this.express.use(morgan('combined', { 
       stream: { 
         write: message => this.logger.info(message.trim()) 

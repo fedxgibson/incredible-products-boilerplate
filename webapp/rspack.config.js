@@ -22,7 +22,6 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[contenthash].js',
     publicPath: '/',
     clean: true,
   },
@@ -77,6 +76,9 @@ module.exports = {
     hot: true,
     port: 3000,
     host: '0.0.0.0',
+    client: {
+      webSocketURL: 'auto://0.0.0.0:8000/ws',
+    },
     static: {
       directory: path.join(__dirname, 'public'),
     },

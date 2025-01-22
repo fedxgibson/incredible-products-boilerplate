@@ -108,7 +108,7 @@ resource "digitalocean_app" "webapp" {
 
       env {
         key   = "API_URL"
-        value = "https://${var.app_name}.ondigitalocean.app/api/v1"
+        value = "/api/v1"
       }
     }
 
@@ -149,11 +149,6 @@ resource "digitalocean_app" "webapp" {
       }
 
       env {
-        key   = "ORIGIN"
-        value = "https://${var.app_name}.ondigitalocean.app"
-      }
-
-      env {
         key   = "HOST"
         value = "0.0.0.0"
       }
@@ -191,14 +186,6 @@ resource "digitalocean_app" "webapp" {
             path {
               prefix = "/api/v1"
             }
-          }
-          cors {
-            allow_origins {
-              exact = "https://${var.app_name}.ondigitalocean.app"
-            }
-            allow_methods   = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-            allow_headers   = ["Content-Type", "Authorization"]
-            max_age        = "24h"
           }
         }
         rule {

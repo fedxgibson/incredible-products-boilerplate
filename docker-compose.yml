@@ -5,7 +5,7 @@ services:
       context: webapp
       target: runner
     environment:
-      - API_URL=http://localhost:3001/api/v1
+      - API_URL=/api/v1
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET:-random}
     restart: unless-stopped
@@ -24,7 +24,6 @@ services:
       - HOST=0.0.0.0
       - MONGO_URI=mongodb://mongodb:27017
       - MONGO_DB=app
-      - ORIGIN=http://localhost:3000
       - JWT_SECRET=asfasfsasdiojo
       - JWT_EXPIRES_IN=1h
     depends_on:

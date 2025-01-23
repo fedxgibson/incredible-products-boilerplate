@@ -68,6 +68,17 @@ module.exports = {
       },
     ],
   },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: process.env.NODE_ENV === 'production'
+      ? '[name].[contenthash:8].js'
+      : '[name].js',
+    cssFilename: process.env.NODE_ENV === 'production'
+      ? '[name].[contenthash:8].css'
+      : '[name].css',
+    publicPath: '/',
+    clean: true,
+  },
   resolve: {
     extensions: ['.js', '.jsx'],
   },

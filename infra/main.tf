@@ -85,7 +85,6 @@ resource "digitalocean_app" "webapp" {
       dockerfile_path = "webapp/Dockerfile"
 
       http_port = 3000
-
       health_check {
         http_path = "/login"
         port      = 3000

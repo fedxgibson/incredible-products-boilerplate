@@ -21,7 +21,11 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+      }}
+    >
       <SWRConfig value={swrConfig}>
         <AuthProvider>
           <NotificationProvider>

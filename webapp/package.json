@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "rspack serve",
-    "build": "rspack build",
+    "dev": "npx @rspack/cli serve",
+    "build": "npx @rspack/cli build",
     "start": "serve dist -s",
     "lint": "eslint src --ext .js,.jsx",
     "lint:fix": "eslint src --ext .js,.jsx --fix",

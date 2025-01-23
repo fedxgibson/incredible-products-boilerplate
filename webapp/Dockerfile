@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS base
+FROM node:lts-alpine
 
 RUN apk add --no-cache \
     curl \
@@ -6,31 +6,17 @@ RUN apk add --no-cache \
     iputils \
     net-tools
 
-# Stage 1: Install dependencies
-FROM base AS deps
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci  # Using ci instead of install for more reproducible builds
 
-# Stage 2: Build the application
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npx @rspack/cli build
 
-# Stage 3: Production server
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV=production
-
-# Copy built assets
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-
-# Install only production dependencies
-RUN npm install --only=production
+# Make script executable (can combine with COPY to reduce layers)
+COPY start.sh .
+RUN chmod +x start.sh
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["./start.sh"]

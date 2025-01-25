@@ -190,7 +190,7 @@ describe('App', () => {
       app.setupMiddleware();
 
       // Verify all middleware was added
-      expect(mockUse).toHaveBeenCalledTimes(4); // helmet, bodyParser, morgan
+      expect(mockUse).toHaveBeenCalledTimes(3); // helmet, bodyParser, morgan
       
       // Verify health check endpoint was setup
       expect(mockGet).toHaveBeenCalledWith('/health', expect.any(Function));

@@ -570,5 +570,3 @@ class AuthService {
 
 module.exports = AuthService;
 ```
-
-Este ejemplo demuestra cómo se puede utilizar TDD para desarrollar un sistema de autenticación completo, siguiendo el ciclo Red-Green-Refactor y utilizando las características de Jest para simular dependencias y verificar el comportamiento esperado.

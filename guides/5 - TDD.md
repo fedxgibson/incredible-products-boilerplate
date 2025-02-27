@@ -388,10 +388,8 @@ Usa el modo watch de Jest para ejecutar pruebas automáticamente cuando cambias 
 
 ## Recursos Adicionales
 
-- [Documentación Oficial de Jest](https://jestjs.io/docs/getting-started)
-- [Explorando JavaScript: Test-Driven Development (TDD)](https://exploringjs.com/impatient-js/ch_testing.html)
-- [Curso de TDD de Kent C. Dodds](https://testingjavascript.com/)
 - [Jest Cheat Sheet](https://github.com/sapegin/jest-cheat-sheet)
+- [TDD BY Example](https://github.com/GunterMueller/Books-3/blob/master/TDD%20By%20Example.pdf)
 
 ---
 
